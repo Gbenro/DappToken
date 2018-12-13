@@ -1,7 +1,7 @@
 import ether from './helpers/ether'
 import EVMRevert from './helpers/EVMRevert'
-import { increaseTimeTo, duration } from './helpers/increaseTime';
-import latestTime from './helpers/latestTime';
+import { increaseTimeTo, duration } from './helpers/increaseTime'
+import latestTime from './helpers/latestTime'
 
 const BigNumber = web3.BigNumber
 
@@ -27,8 +27,8 @@ contract('DappTokenCrowdsale', function ([_, wallet, investor1, investor2]) {
     this.rate = 500
     this.wallet = wallet
     this.cap = ether(100)
-    this.openingTime = latestTime() + duration.weeks(1),
-    this.closingTime= this.openingTime + duration.weeks(1)
+    ;(this.openingTime = latestTime() + duration.weeks(1)),
+    (this.closingTime = this.openingTime + duration.weeks(1))
 
     // Investor Caps
     this.investorMinCap = ether(0.002)
@@ -41,14 +41,16 @@ contract('DappTokenCrowdsale', function ([_, wallet, investor1, investor2]) {
       this.cap,
       this.openingTime,
       this.closingTime
-
     )
 
     // Transfer token ownership to crowdsale
     await this.token.transferOwnership(this.crowdsale.address)
 
-    //Advance time to crowdsale start
-    await increaseTimeTo(this.openingTime +1)
+    // Add investors to whitelist
+
+    await this.crowdsale.addManyToWhitelist([investor1, investor2])
+    // Advance time to crowdsale start
+    await increaseTimeTo(this.openingTime + 1)
   })
 
   describe('crowdsale', function () {
@@ -153,12 +155,18 @@ contract('DappTokenCrowdsale', function ([_, wallet, investor1, investor2]) {
     })
   })
 
-  describe('timed crowdsale', function(){
-      it('is open', async function(){
-          const isClosed = await  this.crowdsale.hasClosed();
-          isClosed.should.be.false;
-      })
+  describe('timed crowdsale', function () {
+    it('is open', async function () {
+      const isClosed = await this.crowdsale.hasClosed()
+      isClosed.should.be.false
+    })
   })
-
-
+  describe('whitelisted crowdsale', function () {
+    it('rejects contributions fromnon-whitelisted investor', async function () {
+      const notWhitelisted = _
+      await this.crowdsale
+        .buyTokens(notWhitelisted, { value: ether(1), from: notWhitelisted })
+        .should.be.rejectedWith(EVMRevert)
+    })
+  })
 })
