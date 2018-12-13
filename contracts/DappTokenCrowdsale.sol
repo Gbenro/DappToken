@@ -5,8 +5,9 @@ import "../node_modules/openzeppelin-solidity/contracts/crowdsale/emission/Minte
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol";
 import "../node_modules/openzeppelin-solidity/contracts/crowdsale/validation/whitelistedCrowdsale.sol";
+import "../node_modules/openzeppelin-solidity/contracts/crowdsale/distribution/RefundableCrowdsale.sol";
 
-contract DappTokenCrowdsale is Crowdsale, MintedCrowdsale, CappedCrowdsale,TimedCrowdsale, WhitelistedCrowdsale {
+contract DappTokenCrowdsale is Crowdsale, MintedCrowdsale, CappedCrowdsale,TimedCrowdsale, WhitelistedCrowdsale, RefundableCrowdsale {
 // Track investor contributions
     uint256 public investorMinCap = 2000000000000000; // 0.002 ether
     uint256 public investorHardCap = 50000000000000000000; // 50 ether
@@ -19,14 +20,19 @@ contract DappTokenCrowdsale is Crowdsale, MintedCrowdsale, CappedCrowdsale,Timed
         ERC20 _token,
         uint256 _cap,
         uint256 _openingTime,
-        uint256 _closingTime
+        uint256 _closingTime,
+        uint256 _goal
     )
         Crowdsale(_rate, _wallet, _token)
         CappedCrowdsale(_cap)
         TimedCrowdsale(_openingTime, _closingTime)
+        RefundableCrowdsale(_goal)
         public
     {
-
+        require(
+            _goal<=_cap,
+            "Crowdsale Goal exceeds Cap"
+            );
     }
 
     /**
