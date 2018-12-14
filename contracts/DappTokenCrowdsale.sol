@@ -156,3 +156,4 @@ contract DappTokenCrowdsale is Crowdsale, MintedCrowdsale, CappedCrowdsale, Time
     }
 
 }
+
